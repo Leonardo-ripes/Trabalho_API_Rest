@@ -1,4 +1,5 @@
 import pandas as pd
+from flask import jsonify
 
 class MoviesService():
     
@@ -17,24 +18,17 @@ class MoviesService():
     def moviesByReleaseYear(self, year):
         return self.df_filmes[self.df_filmes['release_year'] == int(year)].to_json()
     
-    def addMovie(self, data):
-        type = data['type']
-        title = data['title']	
-        director = data['director']
-        cast = data['cast']
-        country	= data['country']
-        date_added = data['date_added']
-        release_year = data['release_year']
-        rating = data['rating']
-        duration = data['duration']
-        listed_in = data['listed_in']
-        description = data['description']
-        id = 's' + str(int(self.df_filmes['show_id'].tail(1).to_string().split('s')[1]) + 1)
-
-        newMovie = {'show_id': id, 'type': type, 'title': title, 'director': director, 'cast': cast, 'country': country, 'date_added': date_added, 'release_year': release_year, 'rating': rating, 'duration': duration, 'listed_in': listed_in, 'description': description}
-        self.df_filmes = self.df_filmes.append(newMovie, ignore_index=True)
-        return f'New Movie Added: {newMovie}'
-
+    def addMovie(self, movie_data):
+        try:
+            movie_schema = MovieSchema()
+            validated_movie = movie_schema.load(movie_data)
+            id = 's' + str(int(self.df_filmes['show_id'].tail(1).to_string().split('s')[1]) + 1)
+            validated_movie['show_id'] = id
+            self.df_filmes = self.df_filmes.append(newMovie, ignore_index=True)
+            return jsonify({"message": "Movie created successfully", "movie_id": movie_id}), 201
+        except ValidationError as err:
+            return jsonify({"error": err.messages}), 400
+    
     def movieById(self, id):
         return self.df_filmes[self.df_filmes['show_id'] == id].to_json()
         
