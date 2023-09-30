@@ -23,7 +23,7 @@ def movieList():
 
 @app.route('/director', methods=['GET'])
 def movieDirectorList():
-    return  jsonify(moviesService.movieDirectorList())
+    return  moviesService.movieDirectorList()
 
 @app.route('/movies/director/<name>', methods=['GET'])
 def moviesByDirector(name):
